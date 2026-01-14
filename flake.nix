@@ -1,30 +1,39 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.poetry2nix.url = "github:nix-community/poetry2nix";
+  description = "Modern Python 3.14 Development Environment";
 
-  outputs = { self, nixpkgs, poetry2nix }:
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
+
+  outputs = { self, nixpkgs }:
     let
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
+      # Set your system architecture here
+      system = "x86_64-linux"; 
+      pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      packages = forAllSystems (system: let
-        inherit (poetry2nix.lib.mkPoetry2Nix { pkgs = pkgs.${system}; }) mkPoetryApplication;
-      in {
-        default = mkPoetryApplication { projectDir = self; };
-      });
+      devShells.${system}.default = pkgs.mkShell {
+        packages = with pkgs; [
+          # The latest stable interpreter
+          python314
+          
+          # Modern tooling
+          uv           # Faster alternative to pip/venv
+          ruff         # Fast linter and formatter
+          pyright      # Static type checker
+        ];
 
-      devShells = forAllSystems (system: let
-        inherit (poetry2nix.lib.mkPoetry2Nix { pkgs = pkgs.${system}; }) mkPoetryEnv;
-      in {
-        default = pkgs.${system}.mkShellNoCC {
-          packages = with pkgs.${system}; [
-            (mkPoetryEnv { projectDir = self; })
-            poetry
-          ];
-        };
-      });
+        shellHook = ''
+          echo "✨ Python 3.14 Dev Shell Active"
+          echo "System: ${system}"
+          python --version
+          
+          # Optional: Create a local .venv if it doesn't exist
+          if [ ! -d ".venv" ]; then
+            uv venv
+          fi
+          source .venv/bin/activate
+        '';
+      };
     };
 }
-

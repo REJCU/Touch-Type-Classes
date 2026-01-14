@@ -1,5 +1,6 @@
 from sentence_choice import DisplayList
 from engine import TypeEngine
+import random
 
 sentence_categories = {
     "HIGH_FREQUENCY": [
@@ -23,7 +24,13 @@ sentence_categories = {
 }
 
 def main():
-    DisplayList()
+    x = DisplayList()
+    sentence_list = x.result
+    sentence = random.choice(sentence_list)
+    print(f"Randomly chosen was: {sentence}")
+    # print(sentence_list)
+    TypeEngine(sentence)
+
 
 
 

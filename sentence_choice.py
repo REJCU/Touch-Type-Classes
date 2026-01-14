@@ -1,3 +1,5 @@
+import random
+
 sentence_categories = {
     "HIGH_FREQUENCY": [
         "The quick brown fox jumps over the lazy dog",
@@ -26,7 +28,7 @@ category_names = list(sentence_categories.keys())
 class DisplayList():
     def __init__(self):
         self.display_sentence()
-        self.get_choice()
+        self.result = self.get_choice()
 
     def display_sentence(self):
         for i, name in enumerate(category_names):
@@ -41,8 +43,9 @@ class DisplayList():
                 exit()
             chosen_category_name = category_names[choice_index]
             sentence_list = sentence_categories[chosen_category_name]
-            print(sentence_list)
+            # print(sentence_list)
             return sentence_list
+
         except (ValueError, IndexError):
             print("Invalid input!")
             exit()

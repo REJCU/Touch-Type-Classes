@@ -28,10 +28,12 @@ def main():
     sentence_list = x.result
     sentence = random.choice(sentence_list)
     print(f"Randomly chosen was: {sentence}")
+    ui.py()
     # print(sentence_list)
-    TypeEngine(sentence)
+    
+    TypeEngine(text)
 
-
+# UI.py gets the inputs
 
 
 

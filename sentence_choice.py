@@ -1,3 +1,4 @@
+import curses
 import random
 
 sentence_categories = {
@@ -21,31 +22,39 @@ sentence_categories = {
     ],
 }
 
-
 category_names = list(sentence_categories.keys())
 
+def choose_sentence(stdscr):
+    current_row_idx = 0
+    
+    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-class DisplayList():
-    def __init__(self):
-        self.display_sentence()
-        self.result = self.get_choice()
+    def print_menu(stdscr, selected_row_idx):
+        stdscr.clear()
+        h, w = stdscr.getmaxyx()
+        for idx, row in enumerate(category_names):
+            x = w//2 - len(row)//2
+            y = h//2 - len(category_names)//2 + idx
+            if idx == selected_row_idx:
+                stdscr.attron(curses.color_pair(1))
+                stdscr.addstr(y, x, row)
+                stdscr.attroff(curses.color_pair(1))
+            else:
+                stdscr.addstr(y, x, row)
+        stdscr.refresh()
 
-    def display_sentence(self):
-        for i, name in enumerate(category_names):
-            print(f"{i + 1}---{name}")
+    while True:
+        print_menu(stdscr, current_row_idx)
+        key = stdscr.getch()
+        stdscr.clear()
 
-# Get user's choice
-    def get_choice(self):
-        try:
-            choice_index = int(input(">>> ")) - 1
-            if not 0 <= choice_index < len(category_names):
-                print("Invalid choice!")
-                exit()
-            chosen_category_name = category_names[choice_index]
+        if key == curses.KEY_UP and current_row_idx > 0:
+            current_row_idx -= 1
+        elif key == curses.KEY_DOWN and current_row_idx < len(category_names) - 1:
+            current_row_idx += 1
+        elif key == curses.KEY_ENTER or key in [10, 13]:
+            chosen_category_name = category_names[current_row_idx]
             sentence_list = sentence_categories[chosen_category_name]
-            # print(sentence_list)
-            return sentence_list
-
-        except (ValueError, IndexError):
-            print("Invalid input!")
-            exit()
+            return random.choice(sentence_list)
+        
+        print_menu(stdscr, current_row_idx)
